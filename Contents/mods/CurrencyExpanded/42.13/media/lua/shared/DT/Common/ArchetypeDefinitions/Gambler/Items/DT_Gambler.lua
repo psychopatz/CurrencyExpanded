@@ -10,7 +10,7 @@ if DynamicTrading and DynamicTrading.RegisterArchetype then
         disableSellTab = true,
         disableWildcardStock = true,
         allocations = {
-            { item = "Base.ScratchTicket", count = 1, fixedQty = 20, fixedPrice = 100 }
+            { item = "CE.ScratchTicket", count = 1, fixedQty = 50, fixedPrice = 100 }
         },
         expertTags = {},
         wants = {},

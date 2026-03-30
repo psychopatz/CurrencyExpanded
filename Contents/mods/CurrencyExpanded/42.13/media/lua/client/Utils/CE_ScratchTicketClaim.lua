@@ -1,21 +1,51 @@
 require "CE/Common/Config/CE_Config"
 require "CE/Common/Lottery/CE_ScratchTickets"
+require "DT/Common/Utils/DT_AudioManager"
+pcall(require, "DT/Common/UI/ConversationUI/ConversationUI")
 
 local ScratchTickets = CurrencyExpanded.ScratchTickets or {}
 local PendingClaim = nil
+
+if DT_AudioManager and DT_AudioManager.RegisterCategory then
+    DT_AudioManager.RegisterCategory("CE_Cashier", "Wallet")
+end
 
 local function getLocalPlayer()
     return getPlayer() or getSpecificPlayer(0)
 end
 
+local function playUISound(soundName)
+    if not soundName or soundName == "" then
+        return
+    end
+
+    if DT_AudioManager and DT_AudioManager.PlaySound then
+        DT_AudioManager.PlaySound(soundName, false, 1.0)
+    elseif getSoundManager() then
+        getSoundManager():PlaySound(soundName, false, 1.0)
+    end
+end
+
 local function getTraderData(trader)
     if not trader then return nil end
-    return DynamicTrading and DynamicTrading.GetArchetypeData and DynamicTrading.GetArchetypeData(trader.archetype) or nil
+
+    if DynamicTrading and DynamicTrading.GetArchetypeData then
+        local archetypeData = DynamicTrading.GetArchetypeData(trader.archetype)
+        if archetypeData then
+            return archetypeData
+        end
+    end
+
+    return DynamicTrading and DynamicTrading.Archetypes and DynamicTrading.Archetypes[trader.archetype] or nil
 end
 
 local function supportsScratchClaims(trader)
     local archetypeData = getTraderData(trader)
-    return archetypeData and archetypeData.supportsScratchClaims == true
+    if archetypeData then
+        return archetypeData.supportsScratchClaims == true
+    end
+
+    return trader and trader.archetype == "Gambler"
 end
 
 local function addMoneyLocal(inv, totalMoney)
@@ -86,6 +116,21 @@ local function findInsertIndex(options)
     return #options + 1
 end
 
+local function isRootConversationOptions(options)
+    local hasChat = false
+    local hasTrade = false
+
+    for _, option in ipairs(options or {}) do
+        if option.text == "Chat" then
+            hasChat = true
+        elseif option.text == "Trade" then
+            hasTrade = true
+        end
+    end
+
+    return hasChat or hasTrade
+end
+
 local function buildClaimLine(args)
     local total = math.max(0, tonumber(args and args.total) or 0)
     local count = math.max(0, tonumber(args and args.count) or 0)
@@ -101,12 +146,27 @@ local function buildClaimLine(args)
     return "Nice stack. That's $" .. tostring(total) .. " across " .. tostring(count) .. " winning tickets."
 end
 
+local function getClaimSummary(player)
+    local count, total = 0, 0
+    if ScratchTickets.GetPotentialWinnerSummary then
+        count, total = ScratchTickets.GetPotentialWinnerSummary(player)
+    else
+        count = ScratchTickets.CountPotentialWinners(player)
+    end
+
+    return math.max(0, count or 0), math.max(0, total or 0)
+end
+
+local function isClaimOptionText(text)
+    return tostring(text or ""):find("^Claim Win Payout", 1) ~= nil
+end
+
 local function requestClaim(ui, trader, player, refreshFn)
     if not ui or not trader or not player then
         return
     end
 
-    local ticketCount = ScratchTickets.CountPotentialWinners(player)
+    local ticketCount, total = getClaimSummary(player)
     if ticketCount <= 0 then
         ui:speak("You don't have a winning ticket for me right now.")
         if refreshFn then
@@ -134,23 +194,28 @@ local function injectClaimOption(options, ui, trader, player, refreshFn)
         return options
     end
 
+    if not isRootConversationOptions(options) then
+        return options
+    end
+
     if not supportsScratchClaims(trader) then
         return options
     end
 
-    if ScratchTickets.CountPotentialWinners(player) <= 0 then
+    local ticketCount, total = getClaimSummary(player)
+    if ticketCount <= 0 then
         return options
     end
 
     for _, option in ipairs(options) do
-        if option.text == "Claim Win Payout" then
+        if isClaimOptionText(option.text) then
             return options
         end
     end
 
     table.insert(options, findInsertIndex(options), {
-        text = "Claim Win Payout",
-        message = "I need to cash in a winning ticket.",
+        text = "Claim Win Payout ($" .. tostring(total) .. ")",
+        message = "I need to cash in $" .. tostring(total) .. " worth of winning tickets.",
         onSelect = function()
             requestClaim(ui, trader, player, refreshFn)
         end
@@ -159,73 +224,56 @@ local function injectClaimOption(options, ui, trader, player, refreshFn)
     return options
 end
 
-local function wrapGenerateOptions(targetTable, key, traderResolver, refreshResolver)
-    if not targetTable or type(targetTable[key]) ~= "function" or targetTable.__ceScratchClaimWrapped == true then
+local function copyOptions(options)
+    local copied = {}
+    for index, option in ipairs(options or {}) do
+        copied[index] = option
+    end
+    return copied
+end
+
+local function stripClaimOption(options)
+    local cleaned = {}
+    for _, option in ipairs(options or {}) do
+        if not isClaimOptionText(option.text) then
+            table.insert(cleaned, option)
+        end
+    end
+    return cleaned
+end
+
+local function refreshCurrentOptions(ui)
+    if not ui or not ui.updateOptions then
         return
     end
 
-    local original = targetTable[key]
-    targetTable[key] = function(ui, a, b, c)
-        local originalUpdateOptions = ui and ui.updateOptions or nil
-
-        if ui and originalUpdateOptions then
-            ui.updateOptions = function(self, options)
-                local trader = traderResolver(ui, a, b, c)
-                local refreshFn = refreshResolver(ui, a, b, c, original)
-                options = injectClaimOption(options or {}, ui, trader, c or b, refreshFn)
-                return originalUpdateOptions(self, options)
-            end
-        end
-
-        local ok, err = pcall(original, ui, a, b, c)
-
-        if ui and originalUpdateOptions then
-            ui.updateOptions = originalUpdateOptions
-        end
-
-        if not ok then
-            error(err)
-        end
-    end
-
-    targetTable.__ceScratchClaimWrapped = true
+    ui:updateOptions(ui.baseOptions or {})
 end
 
-local function patchDialogueHubs()
-    if DTNPC_TraderDialogue_Hub and type(DTNPC_TraderDialogue_Hub.GenerateOptions) == "function" and not DTNPC_TraderDialogue_Hub.__ceScratchClaimPatched then
-        wrapGenerateOptions(
-            DTNPC_TraderDialogue_Hub,
-            "GenerateOptions",
-            function(ui)
-                return ui and ui.target or nil
-            end,
-            function(ui, npc, player, _, original)
-                return function()
-                    original(ui, npc, player)
-                end
-            end
-        )
-        DTNPC_TraderDialogue_Hub.__ceScratchClaimPatched = true
+local function wrapConversationUI()
+    if not DT_ConversationUI or type(DT_ConversationUI.updateOptions) ~= "function" or DT_ConversationUI.__ceScratchClaimPatched == true then
+        return
     end
 
-    if DT_V1_Dialogue_Hub and type(DT_V1_Dialogue_Hub.GenerateOptions) == "function" and not DT_V1_Dialogue_Hub.__ceScratchClaimPatched then
-        wrapGenerateOptions(
-            DT_V1_Dialogue_Hub,
-            "GenerateOptions",
-            function(_, _, traderID)
-                if DynamicTrading and DynamicTrading.Manager and DynamicTrading.Manager.GetTrader then
-                    return DynamicTrading.Manager.GetTrader(traderID)
-                end
-                return nil
-            end,
-            function(ui, radioObj, traderID, player, original)
-                return function()
-                    original(ui, radioObj, traderID, player)
-                end
+    local original = DT_ConversationUI.updateOptions
+    DT_ConversationUI.updateOptions = function(self, options)
+        local baseOptions = stripClaimOption(copyOptions(options))
+        local injectedOptions = injectClaimOption(
+            copyOptions(baseOptions),
+            self,
+            self and self.target or nil,
+            getLocalPlayer(),
+            function()
+                refreshCurrentOptions(self)
             end
         )
-        DT_V1_Dialogue_Hub.__ceScratchClaimPatched = true
+
+        local result = original(self, injectedOptions)
+        self.baseOptions = baseOptions
+        return result
     end
+
+    DT_ConversationUI.__ceScratchClaimPatched = true
 end
 
 local function OnServerCommand(module, command, args)
@@ -236,6 +284,7 @@ local function OnServerCommand(module, command, args)
     local player = getLocalPlayer()
     if player then
         if (tonumber(args and args.total) or 0) > 0 then
+            playUISound("CE_Cashier")
             player:setHaloNote("+ $" .. tostring(args.total), 50, 255, 50, 300)
         else
             player:setHaloNote("No payout", 170, 170, 170, 300)
@@ -253,6 +302,6 @@ local function OnServerCommand(module, command, args)
     end
 end
 
-patchDialogueHubs()
-Events.OnGameBoot.Add(patchDialogueHubs)
+wrapConversationUI()
+Events.OnGameBoot.Add(wrapConversationUI)
 Events.OnServerCommand.Add(OnServerCommand)

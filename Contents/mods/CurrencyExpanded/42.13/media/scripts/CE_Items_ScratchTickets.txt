@@ -1,0 +1,14 @@
+module CE
+{
+    item ScratchTicket
+    {
+        DisplayCategory = Junk,
+        Weight = 0.1,
+        ItemType = base:literature,
+        Icon = ScratchTicket,
+        ReadType = photo,
+        StaticModel = ScratchTicket,
+        WorldStaticModel = ScratchTicket,
+        Tags = base:uninteresting,
+    }
+}

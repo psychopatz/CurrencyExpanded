@@ -20,6 +20,83 @@ local function addMoneyToInventory(inv, totalMoney)
     end
 end
 
+local function findTicketByID(player, args)
+    if not player or not player.getInventory then
+        return nil
+    end
+
+    local inv = player:getInventory()
+    if not inv then
+        return nil
+    end
+
+    local itemID = args and args.itemID or nil
+    if itemID then
+        return inv:getItemById(itemID)
+    end
+
+    return nil
+end
+
+local function buildLotteryInfoPayload(detail)
+    local snapshot = ScratchTickets.GetLotteryInfoSnapshot and ScratchTickets.GetLotteryInfoSnapshot(6) or {}
+    return {
+        detail = tostring(detail or "SUMMARY"),
+        jackpot = math.max(0, tonumber(snapshot.jackpot) or 0),
+        commonLowMax = math.max(0, tonumber(snapshot.commonLowMax) or 0),
+        commonMediumMax = math.max(0, tonumber(snapshot.commonMediumMax) or 0),
+        commonHighMax = math.max(0, tonumber(snapshot.commonHighMax) or 0),
+        commonMin = math.max(0, tonumber(snapshot.commonMin) or 0),
+        commonMax = math.max(0, tonumber(snapshot.commonMax) or 0),
+        winners = type(snapshot.winners) == "table" and snapshot.winners or {}
+    }
+end
+
+function Commands.ScratchTicket(player, args)
+    if not player or not ScratchTickets or not ScratchTickets.CanScratchItem then
+        return
+    end
+
+    local ticket = findTicketByID(player, args)
+    if not ticket then
+        return
+    end
+
+    if not ScratchTickets.CanScratchItem(ticket) then
+        Helpers.SendResponse(player, "CurrencyExpanded", "ScratchTicketResult", {
+            status = "ALREADY_SCRATCHED",
+            itemID = ticket:getID(),
+            amount = ScratchTickets.GetWinAmount(ticket),
+            resultType = ScratchTickets.GetWinAmount(ticket) > 0 and "WIN" or "LOSE",
+            tier = ScratchTickets.GetWinAmount(ticket) > 0 and "HIGH" or "LOSE"
+        })
+        return
+    end
+
+    local amount, resultType, tier = ScratchTickets.RollScratchOutcome(player)
+    if resultType == "LOSE" then
+        ScratchTickets.MarkLoser(ticket)
+    else
+        ScratchTickets.MarkWinner(ticket, amount)
+    end
+
+    if ScratchTickets.RecordScratchResult then
+        ScratchTickets.RecordScratchResult(player, amount, resultType, tier)
+    end
+
+    if ticket.syncItemFields then
+        ticket:syncItemFields()
+    end
+
+    Helpers.SendResponse(player, "CurrencyExpanded", "ScratchTicketResult", {
+        status = "SCRATCHED",
+        itemID = ticket:getID(),
+        amount = amount,
+        resultType = resultType,
+        tier = tier
+    })
+end
+
 function Commands.ClaimScratchTickets(player, args)
     if not player or not ScratchTickets or not ScratchTickets.CollectPotentialWinners then
         return
@@ -57,6 +134,14 @@ function Commands.ClaimScratchTickets(player, args)
         count = count,
         traderID = args and args.traderID or nil
     })
+end
+
+function Commands.RequestScratchLotteryInfo(player, args)
+    if not player then
+        return
+    end
+
+    Helpers.SendResponse(player, "CurrencyExpanded", "ScratchLotteryInfo", buildLotteryInfoPayload(args and args.detail or "SUMMARY"))
 end
 
 local function OnClientCommand(module, command, player, args)

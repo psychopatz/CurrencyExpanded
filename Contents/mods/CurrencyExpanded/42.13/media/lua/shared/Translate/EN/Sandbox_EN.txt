@@ -16,9 +16,36 @@ Sandbox_EN = {
     Sandbox_CurrencyExpanded_ScratchTicketWinChance = "Scratch Ticket: Win Chance (%)",
     Sandbox_CurrencyExpanded_ScratchTicketWinChance_tooltip = "Chance that a randomized scratch ticket becomes a winner when scratched.",
 
+    Sandbox_CurrencyExpanded_ScratchTicketJackpotChance = "Scratch Ticket: Jackpot Chance (%)",
+    Sandbox_CurrencyExpanded_ScratchTicketJackpotChance_tooltip = "Extra chance for a winning ticket to jump to the live jackpot pool instead of a normal payout.",
+
     Sandbox_CurrencyExpanded_ScratchTicketMinWin = "Scratch Ticket: Min Win",
     Sandbox_CurrencyExpanded_ScratchTicketMinWin_tooltip = "Minimum payout for a winning scratch ticket.",
 
     Sandbox_CurrencyExpanded_ScratchTicketMaxWin = "Scratch Ticket: Max Win",
     Sandbox_CurrencyExpanded_ScratchTicketMaxWin_tooltip = "Maximum payout for a winning scratch ticket.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketLowTierWeight = "Scratch Ticket: Low Tier Weight",
+    Sandbox_CurrencyExpanded_ScratchTicketLowTierWeight_tooltip = "Relative weight for low-tier common wins after a ticket wins.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketMediumTierWeight = "Scratch Ticket: Medium Tier Weight",
+    Sandbox_CurrencyExpanded_ScratchTicketMediumTierWeight_tooltip = "Relative weight for medium-tier common wins after a ticket wins.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketHighTierWeight = "Scratch Ticket: High Tier Weight",
+    Sandbox_CurrencyExpanded_ScratchTicketHighTierWeight_tooltip = "Relative weight for high-tier common wins after a ticket wins.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketLowTierMaxPercent = "Scratch Ticket: Low Tier Ceiling (%)",
+    Sandbox_CurrencyExpanded_ScratchTicketLowTierMaxPercent_tooltip = "Upper payout ceiling for low common wins as a percent of the configured max win.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketMediumTierMaxPercent = "Scratch Ticket: Medium Tier Ceiling (%)",
+    Sandbox_CurrencyExpanded_ScratchTicketMediumTierMaxPercent_tooltip = "Upper payout ceiling for medium common wins as a percent of the configured max win.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketHighTierMaxPercent = "Scratch Ticket: High Tier Ceiling (%)",
+    Sandbox_CurrencyExpanded_ScratchTicketHighTierMaxPercent_tooltip = "Upper payout ceiling for high common wins. Anything above this is reserved for jackpot payouts.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketJackpotBaseMultiplier = "Scratch Ticket: Jackpot Base Multiplier",
+    Sandbox_CurrencyExpanded_ScratchTicketJackpotBaseMultiplier_tooltip = "Multiplier applied to max win to build the base live jackpot before the rolling pool is added.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketJackpotGrowthPerScratch = "Scratch Ticket: Jackpot Growth Per Scratch",
+    Sandbox_CurrencyExpanded_ScratchTicketJackpotGrowthPerScratch_tooltip = "How much the live jackpot grows after each non-jackpot scratch.",
 }

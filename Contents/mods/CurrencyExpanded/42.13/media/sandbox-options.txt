@@ -50,6 +50,16 @@ option CurrencyExpanded.ScratchTicketWinChance
     translation = CurrencyExpanded_ScratchTicketWinChance,
 }
 
+option CurrencyExpanded.ScratchTicketJackpotChance
+{
+    type = double,
+    default = 2.5,
+    min = 0.0,
+    max = 25.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketJackpotChance,
+}
+
 option CurrencyExpanded.ScratchTicketMinWin
 {
     type = integer,
@@ -68,4 +78,84 @@ option CurrencyExpanded.ScratchTicketMaxWin
     max = 50000,
     page = CurrencyExpandedMisc,
     translation = CurrencyExpanded_ScratchTicketMaxWin,
+}
+
+option CurrencyExpanded.ScratchTicketLowTierWeight
+{
+    type = integer,
+    default = 60,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketLowTierWeight,
+}
+
+option CurrencyExpanded.ScratchTicketMediumTierWeight
+{
+    type = integer,
+    default = 28,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketMediumTierWeight,
+}
+
+option CurrencyExpanded.ScratchTicketHighTierWeight
+{
+    type = integer,
+    default = 12,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketHighTierWeight,
+}
+
+option CurrencyExpanded.ScratchTicketLowTierMaxPercent
+{
+    type = integer,
+    default = 22,
+    min = 5,
+    max = 60,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketLowTierMaxPercent,
+}
+
+option CurrencyExpanded.ScratchTicketMediumTierMaxPercent
+{
+    type = integer,
+    default = 55,
+    min = 10,
+    max = 85,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketMediumTierMaxPercent,
+}
+
+option CurrencyExpanded.ScratchTicketHighTierMaxPercent
+{
+    type = integer,
+    default = 82,
+    min = 15,
+    max = 95,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketHighTierMaxPercent,
+}
+
+option CurrencyExpanded.ScratchTicketJackpotBaseMultiplier
+{
+    type = double,
+    default = 1.25,
+    min = 1.0,
+    max = 10.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketJackpotBaseMultiplier,
+}
+
+option CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch
+{
+    type = integer,
+    default = 25,
+    min = 0,
+    max = 1000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketJackpotGrowthPerScratch,
 }
