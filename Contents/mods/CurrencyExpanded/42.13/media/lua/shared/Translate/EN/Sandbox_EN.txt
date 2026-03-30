@@ -1,0 +1,15 @@
+Sandbox_EN = {
+    Sandbox_CurrencyExpandedMisc = "Currency Expanded: Settings",
+
+    Sandbox_CurrencyExpanded_WalletMinCash = "Wallet: Min Cash",
+    Sandbox_CurrencyExpanded_WalletMinCash_tooltip = "The minimum amount of money found in a wallet (if not empty).",
+
+    Sandbox_CurrencyExpanded_WalletMaxCash = "Wallet: Max Cash",
+    Sandbox_CurrencyExpanded_WalletMaxCash_tooltip = "The maximum amount of money found in a normal wallet. Jackpots can exceed this.",
+
+    Sandbox_CurrencyExpanded_WalletEmptyChance = "Wallet: Empty Chance (%)",
+    Sandbox_CurrencyExpanded_WalletEmptyChance_tooltip = "Percentage chance a wallet contains nothing but junk.",
+
+    Sandbox_CurrencyExpanded_WalletJackpotChance = "Wallet: Jackpot Chance (%)",
+    Sandbox_CurrencyExpanded_WalletJackpotChance_tooltip = "Chance to hit the 'Tax Return' tier, granting max cash + bonus.",
+}

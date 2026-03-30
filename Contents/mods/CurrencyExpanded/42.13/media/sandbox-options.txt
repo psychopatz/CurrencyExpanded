@@ -1,0 +1,41 @@
+VERSION = 1,
+
+option CurrencyExpanded.WalletMinCash
+{
+    type = integer,
+    default = 1,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_WalletMinCash,
+}
+
+option CurrencyExpanded.WalletMaxCash
+{
+    type = integer,
+    default = 100,
+    min = 10,
+    max = 2000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_WalletMaxCash,
+}
+
+option CurrencyExpanded.WalletEmptyChance
+{
+    type = integer,
+    default = 35,
+    min = 0,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_WalletEmptyChance,
+}
+
+option CurrencyExpanded.WalletJackpotChance
+{
+    type = double,
+    default = 5.0,
+    min = 0.0,
+    max = 100.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_WalletJackpotChance,
+}
