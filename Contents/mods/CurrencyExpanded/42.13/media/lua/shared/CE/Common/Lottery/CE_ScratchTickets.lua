@@ -6,11 +6,11 @@ CurrencyExpanded.ScratchTickets = CurrencyExpanded.ScratchTickets or {}
 local ScratchTickets = CurrencyExpanded.ScratchTickets
 
 local STATE_KEY = "CE_ScratchState"
-local WIN_AMOUNT_KEY = "CE_ScratchWinAmount"
+local PAYOUT_VALUE_KEY = "CE_ScratchTicketValue"
+local LEGACY_WIN_AMOUNT_KEY = "CE_ScratchWinAmount"
 local CLAIMED_KEY = "CE_ScratchClaimed"
 local ORIGINAL_NAME_KEY = "CE_ScratchOriginalName"
 local VISUAL_TYPE_KEY = "CE_ScratchVisualType"
-local CUSTOM_TICKET_FULL_TYPE = "CE.ScratchTicket"
 local SCRATCH_LOTTERY_STATE_KEY = "CE_ScratchLotteryState"
 local LOTTERY_LEDGER_KEY = "CurrencyExpanded_ScratchLottery"
 local WEEK_HOURS = 24 * 7
@@ -413,11 +413,34 @@ local function applyTicketVisual(item, fullType)
 end
 
 local function getDefaultVisualType(item)
-    if item and item.getFullType and item:getFullType() == CUSTOM_TICKET_FULL_TYPE then
-        return CUSTOM_TICKET_FULL_TYPE
+    return "Base.ScratchTicket"
+end
+
+local function getStoredPayoutValue(modData)
+    if type(modData) ~= "table" then
+        return 0
     end
 
-    return "Base.ScratchTicket"
+    local storedValue = modData[PAYOUT_VALUE_KEY]
+    if storedValue == nil then
+        storedValue = modData[LEGACY_WIN_AMOUNT_KEY]
+    end
+
+    return math.max(0, floorNumber(storedValue, 0))
+end
+
+local function setStoredPayoutValue(modData, amount)
+    if type(modData) ~= "table" then
+        return
+    end
+
+    local payout = math.max(0, floorNumber(amount, 0))
+    modData[PAYOUT_VALUE_KEY] = payout
+    modData[LEGACY_WIN_AMOUNT_KEY] = payout
+end
+
+local function getWinnerLabel(payout)
+    return "Scratch Ticket Win ($" .. tostring(math.max(0, floorNumber(payout, 0))) .. ")"
 end
 
 local function setTicketPresentation(item, label, tooltip, visualType)
@@ -710,8 +733,7 @@ end
 function ScratchTickets.IsScratchTicket(item)
     if not item then return false end
     local fullType = item:getFullType()
-    return fullType == CUSTOM_TICKET_FULL_TYPE
-        or fullType == "Base.ScratchTicket"
+    return fullType == "Base.ScratchTicket"
         or fullType == "Base.ScratchTicket_Winner"
         or fullType == "Base.ScratchTicket_Loser"
 end
@@ -735,7 +757,7 @@ function ScratchTickets.IsClaimable(item)
     end
 
     local modData = item:getModData()
-    local amount = floorNumber(modData and modData[WIN_AMOUNT_KEY], 0)
+    local amount = getStoredPayoutValue(modData)
     if amount > 0 then
         return true
     end
@@ -746,7 +768,7 @@ end
 function ScratchTickets.CanScratchItem(item)
     if not item then return false end
     local fullType = item:getFullType()
-    if fullType ~= "Base.ScratchTicket" and fullType ~= CUSTOM_TICKET_FULL_TYPE then
+    if fullType ~= "Base.ScratchTicket" then
         return false
     end
     return not ScratchTickets.IsScratched(item)
@@ -755,7 +777,7 @@ end
 function ScratchTickets.GetWinAmount(item)
     if not item then return 0 end
     local modData = item:getModData()
-    return math.max(0, floorNumber(modData and modData[WIN_AMOUNT_KEY], 0))
+    return getStoredPayoutValue(modData)
 end
 
 function ScratchTickets.GetWinChance()
@@ -852,11 +874,11 @@ function ScratchTickets.MarkWinner(item, amount)
     local payout = math.max(1, floorNumber(amount, ScratchTickets.RollGuaranteedWinAmount()))
     local modData = item:getModData()
     modData[STATE_KEY] = "WIN"
-    modData[WIN_AMOUNT_KEY] = payout
+    setStoredPayoutValue(modData, payout)
     modData[CLAIMED_KEY] = false
     setTicketPresentation(
         item,
-        "Scratch Ticket - Winner ($" .. tostring(payout) .. ")",
+        getWinnerLabel(payout),
         "Claim this payout from a qualified trader.",
         "Base.ScratchTicket_Winner"
     )
@@ -866,7 +888,7 @@ function ScratchTickets.MarkLoser(item)
     if not item then return end
     local modData = item:getModData()
     modData[STATE_KEY] = "LOSE"
-    modData[WIN_AMOUNT_KEY] = 0
+    setStoredPayoutValue(modData, 0)
     modData[CLAIMED_KEY] = false
     setTicketPresentation(item, "Scratch Ticket - Loser", "No payout on this ticket.", "Base.ScratchTicket_Loser")
 end
@@ -876,7 +898,7 @@ function ScratchTickets.MarkClaimed(item)
     local modData = item:getModData()
     modData[STATE_KEY] = "CLAIMED"
     modData[CLAIMED_KEY] = true
-    modData[WIN_AMOUNT_KEY] = 0
+    setStoredPayoutValue(modData, 0)
     setTicketPresentation(item, "Claimed Scratch Ticket", "This ticket has already been paid out.", "Base.ScratchTicket_Winner")
 end
 

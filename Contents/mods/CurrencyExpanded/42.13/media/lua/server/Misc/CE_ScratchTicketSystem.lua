@@ -3,8 +3,10 @@ require "CE/Common/Config/CE_Config"
 require "CE/Common/Lottery/CE_ScratchTickets"
 
 local Commands = {}
-local Helpers = CurrencyExpanded.ServerHelpers
+local Helpers = DynamicTrading and DynamicTrading.ServerHelpers or CurrencyExpanded.ServerHelpers
 local ScratchTickets = CurrencyExpanded.ScratchTickets or {}
+
+CurrencyExpanded.ServerHelpers = Helpers
 
 local function addMoneyToInventory(inv, totalMoney)
     if not inv or totalMoney <= 0 then return end
@@ -53,6 +55,11 @@ local function buildLotteryInfoPayload(detail)
 end
 
 function Commands.ScratchTicket(player, args)
+    if not Helpers then
+        CurrencyExpanded.Log("CECommons", "Error", "ScratchTicket", "DynamicTrading server helpers unavailable")
+        return
+    end
+
     if not player or not ScratchTickets or not ScratchTickets.CanScratchItem then
         return
     end
@@ -98,6 +105,11 @@ function Commands.ScratchTicket(player, args)
 end
 
 function Commands.ClaimScratchTickets(player, args)
+    if not Helpers then
+        CurrencyExpanded.Log("CECommons", "Error", "ScratchTicket", "DynamicTrading server helpers unavailable")
+        return
+    end
+
     if not player or not ScratchTickets or not ScratchTickets.CollectPotentialWinners then
         return
     end
@@ -137,6 +149,11 @@ function Commands.ClaimScratchTickets(player, args)
 end
 
 function Commands.RequestScratchLotteryInfo(player, args)
+    if not Helpers then
+        CurrencyExpanded.Log("CECommons", "Error", "ScratchTicket", "DynamicTrading server helpers unavailable")
+        return
+    end
+
     if not player then
         return
     end

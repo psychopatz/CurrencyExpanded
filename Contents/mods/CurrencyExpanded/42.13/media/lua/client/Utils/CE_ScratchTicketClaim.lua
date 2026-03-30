@@ -2,6 +2,7 @@ require "CE/Common/Config/CE_Config"
 require "CE/Common/Lottery/CE_ScratchTickets"
 require "DT/Common/Utils/DT_AudioManager"
 pcall(require, "DT/Common/UI/ConversationUI/ConversationUI")
+pcall(require, "DT/V2/NPC/UI/DTNPC_TraderDialogue_Hub")
 
 local ScratchTickets = CurrencyExpanded.ScratchTickets or {}
 local PendingClaim = nil
@@ -276,6 +277,50 @@ local function wrapConversationUI()
     DT_ConversationUI.__ceScratchClaimPatched = true
 end
 
+local function wrapTraderDialogueHub()
+    if not DTNPC_TraderDialogue_Hub or DTNPC_TraderDialogue_Hub.__ceScratchClaimPatched == true then
+        return
+    end
+
+    if type(DTNPC_TraderDialogue_Hub.GenerateOptions) == "function" then
+        local originalGenerateOptions = DTNPC_TraderDialogue_Hub.GenerateOptions
+        DTNPC_TraderDialogue_Hub.GenerateOptions = function(ui, npc, player)
+            if not ui then
+                return originalGenerateOptions(ui, npc, player)
+            end
+
+            local originalUpdateOptions = ui.updateOptions
+            ui.updateOptions = function(self, options)
+                ui.updateOptions = originalUpdateOptions
+
+                local baseOptions = stripClaimOption(copyOptions(options))
+                local injectedOptions = injectClaimOption(
+                    copyOptions(baseOptions),
+                    self,
+                    (self and self.target) or npc,
+                    player or getLocalPlayer(),
+                    function()
+                        refreshCurrentOptions(self)
+                    end
+                )
+
+                return originalUpdateOptions(self, injectedOptions)
+            end
+
+            local ok, result = pcall(originalGenerateOptions, ui, npc, player)
+            ui.updateOptions = originalUpdateOptions
+
+            if not ok then
+                error(result)
+            end
+
+            return result
+        end
+    end
+
+    DTNPC_TraderDialogue_Hub.__ceScratchClaimPatched = true
+end
+
 local function OnServerCommand(module, command, args)
     if module ~= "CurrencyExpanded" or command ~= "ScratchClaimResult" then
         return
@@ -303,5 +348,7 @@ local function OnServerCommand(module, command, args)
 end
 
 wrapConversationUI()
+wrapTraderDialogueHub()
 Events.OnGameBoot.Add(wrapConversationUI)
+Events.OnGameStart.Add(wrapTraderDialogueHub)
 Events.OnServerCommand.Add(OnServerCommand)

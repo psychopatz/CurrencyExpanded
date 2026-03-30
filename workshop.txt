@@ -1,0 +1,6 @@
+version=1
+id=3695675339
+title=Dynamic Trading - Currency Expanded
+description=Currency Addon for Dynamic Trading which features Wallet Rummaging and Lottery System
+tags=Build 42;Balance;Interface;Items;Misc;Multiplayer;Realistic;QoL;WIP
+visibility=public

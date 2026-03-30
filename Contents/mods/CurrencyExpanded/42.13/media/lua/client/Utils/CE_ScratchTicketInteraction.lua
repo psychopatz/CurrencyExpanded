@@ -277,6 +277,54 @@ local function addDisabledOption(context, text, icon)
     return option
 end
 
+local function appendResolvedItems(source, results, seen)
+    if not source then
+        return
+    end
+
+    if source.getFullType then
+        local itemID = source.getID and source:getID() or tostring(source)
+        if not seen[itemID] then
+            seen[itemID] = true
+            table.insert(results, source)
+        end
+        return
+    end
+
+    if type(source) ~= "table" then
+        return
+    end
+
+    local wrappedItems = rawget(source, "items")
+    if wrappedItems and wrappedItems ~= source then
+        if wrappedItems.getFullType then
+            appendResolvedItems(wrappedItems, results, seen)
+        else
+            for _, value in ipairs(wrappedItems) do
+                appendResolvedItems(value, results, seen)
+            end
+        end
+    end
+
+    for _, value in ipairs(source) do
+        appendResolvedItems(value, results, seen)
+    end
+end
+
+local function resolveSelectedScratchItems(items)
+    local resolved = {}
+    local seen = {}
+
+    if ISInventoryPane and ISInventoryPane.getActualItems then
+        appendResolvedItems(ISInventoryPane.getActualItems(items), resolved, seen)
+    end
+
+    if #resolved == 0 then
+        appendResolvedItems(items, resolved, seen)
+    end
+    return resolved
+end
+
 local function onScratchTickets(items, playerObj, scratchAll)
     if not playerObj or not items then
         return
@@ -287,7 +335,7 @@ local function onScratchTickets(items, playerObj, scratchAll)
         return
     end
 
-    local actualItems = ISInventoryPane.getActualItems(items)
+    local actualItems = resolveSelectedScratchItems(items)
     local ticketsToScratch = {}
 
     if scratchAll then
@@ -330,7 +378,7 @@ local function ScratchTicketContextMenu(playerIndex, context, items)
         return
     end
 
-    local actualItems = ISInventoryPane.getActualItems(items)
+    local actualItems = resolveSelectedScratchItems(items)
     local ticketCount = 0
     local scratchableCount = 0
     local testItem = nil
@@ -352,9 +400,9 @@ local function ScratchTicketContextMenu(playerIndex, context, items)
     local scratchIcon = getTexture("Item_ScratchTicket") or getTexture("Item_Dice")
 
     if scratchableCount > 0 then
-        local text = "Scratch Ticket"
+        local text = "Carefully Scratch Ticket"
         if scratchableCount > 1 then
-            text = "Scratch Selected Tickets (" .. scratchableCount .. ")"
+            text = "Carefully Scratch Selected Tickets (" .. scratchableCount .. ")"
         end
 
         local option = context:addOption(text, items, onScratchTickets, playerObj, false)
@@ -384,9 +432,9 @@ local function ScratchTicketContextMenu(playerIndex, context, items)
     end
 
     if totalScratchableInContainer > scratchableCount then
-        local allText = "Scratch ALL Tickets (" .. totalScratchableInContainer .. ")"
+        local allText = "Carefully Scratch ALL Tickets (" .. totalScratchableInContainer .. ")"
         if totalScratchableInContainer == 1 then
-            allText = "Scratch Remaining Ticket"
+            allText = "Carefully Scratch Remaining Ticket"
         end
 
         local allOption = context:addOption(allText, items, onScratchTickets, playerObj, true)

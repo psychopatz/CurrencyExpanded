@@ -7,10 +7,12 @@ require "CE/Common/Config/CE_Config"
 require "CE/Common/Wallet/CE_WalletLottery"
 
 local Commands = {}
-local Helpers = CurrencyExpanded.ServerHelpers
+local Helpers = DynamicTrading and DynamicTrading.ServerHelpers or CurrencyExpanded.ServerHelpers
 local WALLET_SEARCHED_KEY = "CE_WalletSearched"
 local WALLET_ORIGINAL_NAME_KEY = "CE_WalletOriginalName"
 local WalletLottery = CurrencyExpanded.WalletLottery or {}
+
+CurrencyExpanded.ServerHelpers = Helpers
 
 local function getWalletBaseName(item)
     if not item then return "Wallet" end
@@ -55,6 +57,11 @@ end
 -- 2. COMMAND HANDLER
 -- =============================================================================
 function Commands.OpenWallet(player, args)
+    if not Helpers then
+        CurrencyExpanded.Log("CECommons", "Error", "Wallet", "DynamicTrading server helpers unavailable")
+        return
+    end
+
     local inv = player:getInventory()
     local requestedItemID = args and args.itemID or nil
 

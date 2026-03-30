@@ -229,6 +229,10 @@ local function OnServerCommand(module, command, args)
             end
         end
 
+        if ISInventoryPage and ISInventoryPage.dirtyUI then
+            ISInventoryPage.dirtyUI()
+        end
+
         if type == "ALREADY_SEARCHED" then
             ShowFloatingText(player, "Already searched", 150, 150, 150)
             return
