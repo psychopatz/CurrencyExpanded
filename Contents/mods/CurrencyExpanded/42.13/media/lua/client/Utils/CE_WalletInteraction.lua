@@ -5,13 +5,19 @@
 require "TimedActions/ISBaseTimedAction"
 require "TimedActions/ISInventoryTransferAction"
 require "DT/Common/Utils/DT_AudioManager"
+require "CE/Common/Config/CE_Config"
 require "CE/Common/Wallet/CE_WalletLottery"
-require "DT/Common/InteractionStrings/DT_InteractionStrings"
+require "CE/Common/InteractionStrings/Lottery/CE_InteractionStrings_Lottery_Wallet"
 
 local WALLET_SEARCHED_KEY = "CE_WalletSearched"
 local WALLET_ORIGINAL_NAME_KEY = "CE_WalletOriginalName"
 local WalletLottery = CurrencyExpanded.WalletLottery or {}
 local WalletTalk = CurrencyExpanded.GetInteractionStrings("Lottery", "Wallet") or {}
+
+if DT_AudioManager and DT_AudioManager.RegisterCategory then
+    DT_AudioManager.RegisterCategory("CE_Casino", "Wallet")
+    DT_AudioManager.RegisterCategory("CE_Cashier", "Wallet")
+end
 
 -- =============================================================================
 -- 1. FLAVOR TEXT & CONFIG
@@ -136,9 +142,9 @@ function ISWalletAction:update()
         self.soundStarted = true
         
         if DT_AudioManager then
-            DT_AudioManager.PlaySound("DT_CasinoRandom", false, 1.0)
+            DT_AudioManager.PlaySound("CE_CasinoRandom", false, 1.0)
         else
-            getSoundManager():PlaySound("DT_CasinoRandom", false, 1.0)
+            getSoundManager():PlaySound("CE_CasinoRandom", false, 1.0)
         end
         
         -- DYNAMIC FLAVOR TEXT LOGIC
@@ -229,7 +235,7 @@ local function OnServerCommand(module, command, args)
         end
 
         if type == "EMPTY" then
-            if DT_AudioManager then DT_AudioManager.PlaySound("DT_CasinoLose", false, 1.0) else getSoundManager():PlaySound("DT_CasinoLose", false, 1.0) end
+            if DT_AudioManager then DT_AudioManager.PlaySound("CE_CasinoLose", false, 1.0) else getSoundManager():PlaySound("CE_CasinoLose", false, 1.0) end
             
             -- Reduced chat spam for mass opening
             if ZombRand(100) < 30 then 
@@ -238,7 +244,7 @@ local function OnServerCommand(module, command, args)
             
             ShowFloatingText(player, "Empty", 150, 150, 150)
         else
-            if DT_AudioManager then DT_AudioManager.PlaySound("DT_Cashier", false, 1.0) else getSoundManager():PlaySound("DT_Cashier", false, 1.0) end
+            if DT_AudioManager then DT_AudioManager.PlaySound("CE_Cashier", false, 1.0) else getSoundManager():PlaySound("CE_Cashier", false, 1.0) end
             
             local maxPossible = math.max(1, SandboxVars.CurrencyExpanded.WalletMaxCash or 300)
             local ratio = total / maxPossible

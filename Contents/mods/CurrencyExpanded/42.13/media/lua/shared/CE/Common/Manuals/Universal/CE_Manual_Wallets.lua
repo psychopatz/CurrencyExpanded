@@ -41,7 +41,7 @@
 --   ]
 -- }
 -- DT_MANUAL_EDITOR_END
-if DynamicTrading and CurrencyExpanded.RegisterManual then
+if CurrencyExpanded and CurrencyExpanded.RegisterManual then
     CurrencyExpanded.RegisterManual("dt_wallets", {
         title = "A Guide to Local Currency",
         description = "How to find, store, and manage the only thing that still has value in Kentucky.",

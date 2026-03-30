@@ -3,6 +3,7 @@
 -- =============================================================================
 
 require "DT/Common/ServerHelpers/ServerHelpers"
+require "CE/Common/Config/CE_Config"
 require "CE/Common/Wallet/CE_WalletLottery"
 
 local Commands = {}

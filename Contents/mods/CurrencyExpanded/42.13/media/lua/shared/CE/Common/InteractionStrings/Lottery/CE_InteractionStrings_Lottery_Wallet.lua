@@ -1,3 +1,5 @@
+require "CE/Common/Config/CE_Config"
+
 CurrencyExpanded = CurrencyExpanded or {}
 
 if not CurrencyExpanded.RegisterInteractionStrings then

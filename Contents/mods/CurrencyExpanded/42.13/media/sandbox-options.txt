@@ -14,8 +14,8 @@ option CurrencyExpanded.WalletMaxCash
 {
     type = integer,
     default = 100,
-    min = 10,
-    max = 2000,
+    min = 0,
+    max = 200,
     page = CurrencyExpandedMisc,
     translation = CurrencyExpanded_WalletMaxCash,
 }
@@ -23,7 +23,7 @@ option CurrencyExpanded.WalletMaxCash
 option CurrencyExpanded.WalletEmptyChance
 {
     type = integer,
-    default = 35,
+    default = 45,
     min = 0,
     max = 100,
     page = CurrencyExpandedMisc,
@@ -38,4 +38,34 @@ option CurrencyExpanded.WalletJackpotChance
     max = 100.0,
     page = CurrencyExpandedMisc,
     translation = CurrencyExpanded_WalletJackpotChance,
+}
+
+option CurrencyExpanded.ScratchTicketWinChance
+{
+    type = double,
+    default = 15.0,
+    min = 0.0,
+    max = 100.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketWinChance,
+}
+
+option CurrencyExpanded.ScratchTicketMinWin
+{
+    type = integer,
+    default = 125,
+    min = 1,
+    max = 10000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketMinWin,
+}
+
+option CurrencyExpanded.ScratchTicketMaxWin
+{
+    type = integer,
+    default = 5000,
+    min = 1,
+    max = 50000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded_ScratchTicketMaxWin,
 }

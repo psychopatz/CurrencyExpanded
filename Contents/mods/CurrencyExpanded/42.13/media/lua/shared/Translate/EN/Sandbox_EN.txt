@@ -12,4 +12,13 @@ Sandbox_EN = {
 
     Sandbox_CurrencyExpanded_WalletJackpotChance = "Wallet: Jackpot Chance (%)",
     Sandbox_CurrencyExpanded_WalletJackpotChance_tooltip = "Chance to hit the 'Tax Return' tier, granting max cash + bonus.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketWinChance = "Scratch Ticket: Win Chance (%)",
+    Sandbox_CurrencyExpanded_ScratchTicketWinChance_tooltip = "Chance that a randomized scratch ticket becomes a winner when scratched.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketMinWin = "Scratch Ticket: Min Win",
+    Sandbox_CurrencyExpanded_ScratchTicketMinWin_tooltip = "Minimum payout for a winning scratch ticket.",
+
+    Sandbox_CurrencyExpanded_ScratchTicketMaxWin = "Scratch Ticket: Max Win",
+    Sandbox_CurrencyExpanded_ScratchTicketMaxWin_tooltip = "Maximum payout for a winning scratch ticket.",
 }
