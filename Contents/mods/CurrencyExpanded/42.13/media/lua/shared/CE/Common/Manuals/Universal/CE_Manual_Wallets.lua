@@ -1,9 +1,13 @@
 -- DT_MANUAL_EDITOR_BEGIN
 -- {
 --   "manual_id": "dt_wallets",
+--   "module": "currency",
 --   "title": "A Guide to Local Currency",
 --   "description": "How to find, store, and manage the only thing that still has value in Kentucky.",
 --   "start_page_id": "wallet_generation",
+--   "audiences": [
+--     "currency"
+--   ],
 --   "chapters": [
 --     { "id": "loot_logic", "title": "Scavenging for Cash", "description": "Finding money on the bodies of the fallen." },
 --     { "id": "currency_types", "title": "Storing Your Wealth", "description": "Managing loose change and currency bundles." }
@@ -45,6 +49,7 @@ if CurrencyExpanded and CurrencyExpanded.RegisterManual then
     CurrencyExpanded.RegisterManual("dt_wallets", {
         title = "A Guide to Local Currency",
         description = "How to find, store, and manage the only thing that still has value in Kentucky.",
+        audiences = { "currency" },
         startPageId = "wallet_generation",
         chapters = {
             { id = "loot_logic", title = "Scavenging for Cash", description = "Finding money on the bodies of the fallen." },
