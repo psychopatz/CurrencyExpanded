@@ -7,4 +7,5 @@ poster=portrait.png
 icon=portrait.png
 require=DynamicTradingCommon
 loadModAfter=DynamicTradingCommon
+version=0.0.1
 versionMin=42.13
