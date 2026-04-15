@@ -1,0 +1,11 @@
+name=Dynamic Trading - Currency Expanded
+id=CurrencyExpanded
+description=Lootable wallets, pre-war cash, and more ways to get rich.
+poster=poster.png
+author=Psychopatz
+poster=portrait.png
+icon=portrait.png
+require=DynamicTradingCommon
+loadModAfter=DynamicTradingCommon
+version=0.0.1
+versionMin=42.16

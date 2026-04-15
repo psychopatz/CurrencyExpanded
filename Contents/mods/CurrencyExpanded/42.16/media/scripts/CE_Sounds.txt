@@ -1,0 +1,26 @@
+module Base
+{
+    sound CE_Cashier
+    {
+        category = UI,
+        is3D = false,
+        clip
+        {
+            file = media/sound/CE_Cashier.ogg,
+            volume = 0.2,
+        }
+    }
+
+    sound CE_CasinoRandom
+    {
+        category = UI,
+        clip { file = media/sound/CE_Casino/1.ogg, }
+        clip { file = media/sound/CE_Casino/2.ogg, }
+    }
+
+    sound CE_CasinoLose
+    {
+        category = UI,
+        clip { file = media/sound/CE_Casino/lose.ogg, volume = 0.4, }
+    }
+}

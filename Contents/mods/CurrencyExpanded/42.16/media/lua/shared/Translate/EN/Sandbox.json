@@ -1,0 +1,51 @@
+{
+    "Sandbox_CurrencyExpandedMisc": "Currency Expanded: Settings",
+
+    "Sandbox_CurrencyExpanded.WalletMinCash": "Wallet: Min Cash",
+    "Sandbox_CurrencyExpanded.WalletMinCash_tooltip": "The minimum amount of money found in a wallet (if not empty).",
+
+    "Sandbox_CurrencyExpanded.WalletMaxCash": "Wallet: Max Cash",
+    "Sandbox_CurrencyExpanded.WalletMaxCash_tooltip": "The maximum amount of money found in a normal wallet. Jackpots can exceed this.",
+
+    "Sandbox_CurrencyExpanded.WalletEmptyChance": "Wallet: Empty Chance (%)",
+    "Sandbox_CurrencyExpanded.WalletEmptyChance_tooltip": "Percentage chance a wallet contains nothing but junk.",
+
+    "Sandbox_CurrencyExpanded.WalletJackpotChance": "Wallet: Jackpot Chance (%)",
+    "Sandbox_CurrencyExpanded.WalletJackpotChance_tooltip": "Chance to hit the 'Tax Return' tier, granting max cash + bonus.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketWinChance": "Scratch Ticket: Win Chance (%)",
+    "Sandbox_CurrencyExpanded.ScratchTicketWinChance_tooltip": "Chance that a randomized scratch ticket becomes a winner when scratched.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketJackpotChance": "Scratch Ticket: Jackpot Chance (%)",
+    "Sandbox_CurrencyExpanded.ScratchTicketJackpotChance_tooltip": "Extra chance for a winning ticket to jump to the live jackpot pool instead of a normal payout.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketMinWin": "Scratch Ticket: Min Win",
+    "Sandbox_CurrencyExpanded.ScratchTicketMinWin_tooltip": "Minimum payout for a winning scratch ticket.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketMaxWin": "Scratch Ticket: Max Win",
+    "Sandbox_CurrencyExpanded.ScratchTicketMaxWin_tooltip": "Maximum payout for a winning scratch ticket.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketLowTierWeight": "Scratch Ticket: Low Tier Weight",
+    "Sandbox_CurrencyExpanded.ScratchTicketLowTierWeight_tooltip": "Relative weight for low-tier common wins after a ticket wins.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketMediumTierWeight": "Scratch Ticket: Medium Tier Weight",
+    "Sandbox_CurrencyExpanded.ScratchTicketMediumTierWeight_tooltip": "Relative weight for medium-tier common wins after a ticket wins.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketHighTierWeight": "Scratch Ticket: High Tier Weight",
+    "Sandbox_CurrencyExpanded.ScratchTicketHighTierWeight_tooltip": "Relative weight for high-tier common wins after a ticket wins.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketLowTierMaxPercent": "Scratch Ticket: Low Tier Ceiling (%)",
+    "Sandbox_CurrencyExpanded.ScratchTicketLowTierMaxPercent_tooltip": "Upper payout ceiling for low common wins as a percent of the configured max win.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketMediumTierMaxPercent": "Scratch Ticket: Medium Tier Ceiling (%)",
+    "Sandbox_CurrencyExpanded.ScratchTicketMediumTierMaxPercent_tooltip": "Upper payout ceiling for medium common wins as a percent of the configured max win.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketHighTierMaxPercent": "Scratch Ticket: High Tier Ceiling (%)",
+    "Sandbox_CurrencyExpanded.ScratchTicketHighTierMaxPercent_tooltip": "Upper payout ceiling for high common wins. Anything above this is reserved for jackpot payouts.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketJackpotBaseMultiplier": "Scratch Ticket: Jackpot Base Multiplier",
+    "Sandbox_CurrencyExpanded.ScratchTicketJackpotBaseMultiplier_tooltip": "Multiplier applied to max win to build the base live jackpot before the rolling pool is added.",
+
+    "Sandbox_CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch": "Scratch Ticket: Jackpot Growth Per Scratch",
+    "Sandbox_CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch_tooltip": "How much the live jackpot grows after each non-jackpot scratch."
+}

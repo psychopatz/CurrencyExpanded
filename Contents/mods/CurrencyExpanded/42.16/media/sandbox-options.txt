@@ -1,0 +1,161 @@
+VERSION = 1,
+
+option CurrencyExpanded.WalletMinCash
+{
+    type = integer,
+    default = 1,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.WalletMinCash,
+}
+
+option CurrencyExpanded.WalletMaxCash
+{
+    type = integer,
+    default = 100,
+    min = 0,
+    max = 200,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.WalletMaxCash,
+}
+
+option CurrencyExpanded.WalletEmptyChance
+{
+    type = integer,
+    default = 45,
+    min = 0,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.WalletEmptyChance,
+}
+
+option CurrencyExpanded.WalletJackpotChance
+{
+    type = double,
+    default = 5.0,
+    min = 0.0,
+    max = 100.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.WalletJackpotChance,
+}
+
+option CurrencyExpanded.ScratchTicketWinChance
+{
+    type = double,
+    default = 15.0,
+    min = 0.0,
+    max = 100.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketWinChance,
+}
+
+option CurrencyExpanded.ScratchTicketJackpotChance
+{
+    type = double,
+    default = 2.5,
+    min = 0.0,
+    max = 25.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketJackpotChance,
+}
+
+option CurrencyExpanded.ScratchTicketMinWin
+{
+    type = integer,
+    default = 125,
+    min = 1,
+    max = 10000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketMinWin,
+}
+
+option CurrencyExpanded.ScratchTicketMaxWin
+{
+    type = integer,
+    default = 5000,
+    min = 1,
+    max = 50000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketMaxWin,
+}
+
+option CurrencyExpanded.ScratchTicketLowTierWeight
+{
+    type = integer,
+    default = 60,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketLowTierWeight,
+}
+
+option CurrencyExpanded.ScratchTicketMediumTierWeight
+{
+    type = integer,
+    default = 28,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketMediumTierWeight,
+}
+
+option CurrencyExpanded.ScratchTicketHighTierWeight
+{
+    type = integer,
+    default = 12,
+    min = 1,
+    max = 100,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketHighTierWeight,
+}
+
+option CurrencyExpanded.ScratchTicketLowTierMaxPercent
+{
+    type = integer,
+    default = 22,
+    min = 5,
+    max = 60,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketLowTierMaxPercent,
+}
+
+option CurrencyExpanded.ScratchTicketMediumTierMaxPercent
+{
+    type = integer,
+    default = 55,
+    min = 10,
+    max = 85,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketMediumTierMaxPercent,
+}
+
+option CurrencyExpanded.ScratchTicketHighTierMaxPercent
+{
+    type = integer,
+    default = 82,
+    min = 15,
+    max = 95,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketHighTierMaxPercent,
+}
+
+option CurrencyExpanded.ScratchTicketJackpotBaseMultiplier
+{
+    type = double,
+    default = 1.25,
+    min = 1.0,
+    max = 10.0,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketJackpotBaseMultiplier,
+}
+
+option CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch
+{
+    type = integer,
+    default = 25,
+    min = 0,
+    max = 1000,
+    page = CurrencyExpandedMisc,
+    translation = CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch,
+}
