@@ -6,7 +6,7 @@ option CurrencyExpanded.WalletMinCash
     default = 1,
     min = 1,
     max = 100,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedWallet,
     translation = CurrencyExpanded.WalletMinCash,
 }
 
@@ -16,7 +16,7 @@ option CurrencyExpanded.WalletMaxCash
     default = 100,
     min = 0,
     max = 200,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedWallet,
     translation = CurrencyExpanded.WalletMaxCash,
 }
 
@@ -26,7 +26,7 @@ option CurrencyExpanded.WalletEmptyChance
     default = 45,
     min = 0,
     max = 100,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedWallet,
     translation = CurrencyExpanded.WalletEmptyChance,
 }
 
@@ -36,7 +36,7 @@ option CurrencyExpanded.WalletJackpotChance
     default = 5.0,
     min = 0.0,
     max = 100.0,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedWallet,
     translation = CurrencyExpanded.WalletJackpotChance,
 }
 
@@ -46,7 +46,7 @@ option CurrencyExpanded.ScratchTicketWinChance
     default = 15.0,
     min = 0.0,
     max = 100.0,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketWinChance,
 }
 
@@ -56,7 +56,7 @@ option CurrencyExpanded.ScratchTicketJackpotChance
     default = 2.5,
     min = 0.0,
     max = 25.0,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketJackpotChance,
 }
 
@@ -66,7 +66,7 @@ option CurrencyExpanded.ScratchTicketMinWin
     default = 125,
     min = 1,
     max = 10000,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketMinWin,
 }
 
@@ -76,7 +76,7 @@ option CurrencyExpanded.ScratchTicketMaxWin
     default = 5000,
     min = 1,
     max = 50000,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketMaxWin,
 }
 
@@ -86,7 +86,7 @@ option CurrencyExpanded.ScratchTicketLowTierWeight
     default = 60,
     min = 1,
     max = 100,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketLowTierWeight,
 }
 
@@ -96,7 +96,7 @@ option CurrencyExpanded.ScratchTicketMediumTierWeight
     default = 28,
     min = 1,
     max = 100,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketMediumTierWeight,
 }
 
@@ -106,7 +106,7 @@ option CurrencyExpanded.ScratchTicketHighTierWeight
     default = 12,
     min = 1,
     max = 100,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketHighTierWeight,
 }
 
@@ -116,7 +116,7 @@ option CurrencyExpanded.ScratchTicketLowTierMaxPercent
     default = 22,
     min = 5,
     max = 60,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketLowTierMaxPercent,
 }
 
@@ -126,7 +126,7 @@ option CurrencyExpanded.ScratchTicketMediumTierMaxPercent
     default = 55,
     min = 10,
     max = 85,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketMediumTierMaxPercent,
 }
 
@@ -136,7 +136,7 @@ option CurrencyExpanded.ScratchTicketHighTierMaxPercent
     default = 82,
     min = 15,
     max = 95,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketHighTierMaxPercent,
 }
 
@@ -146,7 +146,7 @@ option CurrencyExpanded.ScratchTicketJackpotBaseMultiplier
     default = 1.25,
     min = 1.0,
     max = 10.0,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketJackpotBaseMultiplier,
 }
 
@@ -156,6 +156,6 @@ option CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch
     default = 25,
     min = 0,
     max = 1000,
-    page = CurrencyExpandedMisc,
+    page = CurrencyExpandedScratchTickets,
     translation = CurrencyExpanded.ScratchTicketJackpotGrowthPerScratch,
 }

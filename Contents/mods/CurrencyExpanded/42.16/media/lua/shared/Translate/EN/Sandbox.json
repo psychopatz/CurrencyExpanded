@@ -1,5 +1,6 @@
 {
-    "Sandbox_CurrencyExpandedMisc": "Currency Expanded: Settings",
+    "Sandbox_CurrencyExpandedWallet": "Currency Expanded: Wallet",
+    "Sandbox_CurrencyExpandedScratchTickets": "Currency Expanded: Scratch Tickets",
 
     "Sandbox_CurrencyExpanded.WalletMinCash": "Wallet: Min Cash",
     "Sandbox_CurrencyExpanded.WalletMinCash_tooltip": "The minimum amount of money found in a wallet (if not empty).",
