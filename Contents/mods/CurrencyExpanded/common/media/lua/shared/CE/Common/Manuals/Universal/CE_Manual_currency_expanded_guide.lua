@@ -1,12 +1,12 @@
 -- DT_MANUAL_EDITOR_BEGIN
 -- {
 --   "manual_id": "currency_expanded_guide",
---   "module": "currency",
---   "title": "Currency Expanded Add-on",
+--   "module": "CurrencyExpanded",
+--   "title": "Currency Expanded Add-",
 --   "description": "The definitive guide to looting and gambling in Kentucky.",
 --   "start_page_id": "ce_overview",
 --   "audiences": [
---     "common"
+--     "CurrencyExpanded"
 --   ],
 --   "sort_order": 5,
 --   "release_version": "",
@@ -153,10 +153,10 @@
 -- DT_MANUAL_EDITOR_END
 if CurrencyExpanded and CurrencyExpanded.RegisterManual then
     CurrencyExpanded.RegisterManual("currency_expanded_guide", {
-        title = "Currency Expanded Add-on",
+        title = "Currency Expanded Add-",
         description = "The definitive guide to looting and gambling in Kentucky.",
         startPageId = "ce_overview",
-        audiences = { "common" },
+        audiences = { "CurrencyExpanded" },
         sortOrder = 5,
         releaseVersion = "",
         popupVersion = "",

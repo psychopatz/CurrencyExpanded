@@ -1,12 +1,12 @@
 -- DT_MANUAL_EDITOR_BEGIN
 -- {
 --   "manual_id": "dt_wallets",
---   "module": "currency",
+--   "module": "CurrencyExpanded",
 --   "title": "Guide to Currency",
 --   "description": "How to find, store, and manage valuables in Kentucky.",
 --   "start_page_id": "wallet_generation",
 --   "audiences": [
---     "currency"
+--     "CurrencyExpanded"
 --   ],
 --   "sort_order": 300000,
 --   "release_version": "",
@@ -123,7 +123,7 @@ if CurrencyExpanded and CurrencyExpanded.RegisterManual then
         title = "Guide to Currency",
         description = "How to find, store, and manage valuables in Kentucky.",
         startPageId = "wallet_generation",
-        audiences = { "currency" },
+        audiences = { "CurrencyExpanded" },
         sortOrder = 300000,
         releaseVersion = "",
         popupVersion = "",
