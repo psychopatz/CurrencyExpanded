@@ -290,6 +290,31 @@ local function addDisabledWalletOption(context, text, icon)
     return option
 end
 
+local function queueWalletAction(playerObj, playerInv, wallet, isBulkOperation)
+    if not playerObj or not playerInv or not wallet or not ISWalletAction then
+        return false
+    end
+
+    if not wallet.getContainer then
+        return false
+    end
+
+    local sourceContainer = wallet:getContainer()
+    if not sourceContainer then
+        return false
+    end
+
+    if sourceContainer ~= playerInv then
+        if not ISInventoryTransferAction then
+            return false
+        end
+        ISTimedActionQueue.add(ISInventoryTransferAction:new(playerObj, wallet, sourceContainer, playerInv))
+    end
+
+    ISTimedActionQueue.add(ISWalletAction:new(playerObj, wallet, isBulkOperation))
+    return true
+end
+
 -- Helper to actually perform the queue logic
 local function OnOpenWallet(items, playerObj, openAll)
     local playerInv = playerObj:getInventory()
@@ -329,16 +354,7 @@ local function OnOpenWallet(items, playerObj, openAll)
 
     -- 3. Iterate and Queue Actions
     for _, wallet in ipairs(walletsToOpen) do
-        if ISWalletAction then
-            if wallet:getContainer() ~= playerInv then
-                ISTimedActionQueue.add(ISInventoryTransferAction:new(
-                    playerObj, wallet, wallet:getContainer(), playerInv
-                ))
-            end
-            
-            -- Pass the 'isBulkOperation' flag to the action
-            ISTimedActionQueue.add(ISWalletAction:new(playerObj, wallet, isBulkOperation))
-        end
+        queueWalletAction(playerObj, playerInv, wallet, isBulkOperation)
     end
 end
 

@@ -37,6 +37,31 @@ local function forceSay(player, text)
     player:Say(text)
 end
 
+local function queueScratchTicketAction(playerObj, playerInv, ticket, isBulk)
+    if not playerObj or not playerInv or not ticket or not ISScratchTicketAction then
+        return false
+    end
+
+    if not ticket.getContainer then
+        return false
+    end
+
+    local sourceContainer = ticket:getContainer()
+    if not sourceContainer then
+        return false
+    end
+
+    if sourceContainer ~= playerInv then
+        if not ISInventoryTransferAction then
+            return false
+        end
+        ISTimedActionQueue.add(ISInventoryTransferAction:new(playerObj, ticket, sourceContainer, playerInv))
+    end
+
+    ISTimedActionQueue.add(ISScratchTicketAction:new(playerObj, ticket, isBulk))
+    return true
+end
+
 local function playUISound(soundName)
     if not soundName or soundName == "" then
         return
@@ -364,11 +389,7 @@ local function onScratchTickets(items, playerObj, scratchAll)
     end
 
     for _, ticket in ipairs(ticketsToScratch) do
-        if ticket:getContainer() ~= playerInv then
-            ISTimedActionQueue.add(ISInventoryTransferAction:new(playerObj, ticket, ticket:getContainer(), playerInv))
-        end
-
-        ISTimedActionQueue.add(ISScratchTicketAction:new(playerObj, ticket, #ticketsToScratch > 1))
+        queueScratchTicketAction(playerObj, playerInv, ticket, #ticketsToScratch > 1)
     end
 end
 
