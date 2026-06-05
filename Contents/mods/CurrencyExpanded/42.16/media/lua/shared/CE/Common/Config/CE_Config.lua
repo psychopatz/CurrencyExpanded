@@ -1,3 +1,5 @@
+require "CE/Common/Text/CE_Text"
+
 CurrencyExpanded = CurrencyExpanded or {}
 CE_Config = CE_Config or {}
 CurrencyExpanded.InteractionStrings = CurrencyExpanded.InteractionStrings or {}

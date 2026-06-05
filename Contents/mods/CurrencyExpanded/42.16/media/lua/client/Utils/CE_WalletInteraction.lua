@@ -13,6 +13,7 @@ local WALLET_SEARCHED_KEY = "CE_WalletSearched"
 local WALLET_ORIGINAL_NAME_KEY = "CE_WalletOriginalName"
 local WalletLottery = CurrencyExpanded.WalletLottery or {}
 local WalletTalk = CurrencyExpanded.GetInteractionStrings("Lottery", "Wallet") or {}
+local CEText = CurrencyExpanded and CurrencyExpanded.Text or nil
 
 if DT_AudioManager and DT_AudioManager.RegisterCategory then
     DT_AudioManager.RegisterCategory("CE_Casino", "Wallet")
@@ -23,8 +24,34 @@ end
 -- 1. FLAVOR TEXT & CONFIG
 -- =============================================================================
 local function GetRandomLine(category)
-    if not category or #category == 0 then return "..." end
+    if not category or #category == 0 then
+        if CEText and CEText.Get then
+            return CEText.Get("CECommon_UI_Fallback_Ellipsis", nil, "...")
+        end
+        return "..."
+    end
     return category[ZombRand(#category) + 1]
+end
+
+local function T(key, fallback, params)
+    if CEText and CEText.Get then
+        return CEText.Get(key, params, fallback)
+    end
+
+    if type(params) == "table" and fallback then
+        return (tostring(fallback):gsub("{([%w_]+)}", function(name)
+            local value = params[name]
+            return value == nil and ("{" .. name .. "}") or tostring(value)
+        end))
+    end
+
+    return fallback or key
+end
+
+local function formatMoney(amount)
+    return T("CECommon_UI_MoneyAmount", "${amount}", {
+        amount = tostring(math.max(0, math.floor(tonumber(amount) or 0)))
+    })
 end
 
 local function ForceSay(player, text)
@@ -39,14 +66,17 @@ local function ShowFloatingText(player, text, r, g, b)
 end
 
 local function getWalletBaseName(item)
-    if not item then return "Wallet" end
+    if not item then return T("CECommon_UI_Wallet_DefaultName", "Wallet") end
 
     local modData = item:getModData()
     local originalName = modData and modData[WALLET_ORIGINAL_NAME_KEY] or nil
+    local emptyPrefix = T("CECommon_UI_Wallet_EmptyPrefix", "Empty ")
 
     if not originalName or originalName == "" then
-        originalName = tostring(item:getName() or "Wallet")
-        if string.sub(originalName, 1, 6) == "Empty " then
+        originalName = tostring(item:getName() or T("CECommon_UI_Wallet_DefaultName", "Wallet"))
+        if string.sub(originalName, 1, string.len(emptyPrefix)) == emptyPrefix then
+            originalName = string.sub(originalName, string.len(emptyPrefix) + 1)
+        elseif string.sub(originalName, 1, 6) == "Empty " then
             originalName = string.sub(originalName, 7)
         end
         if modData then
@@ -70,7 +100,9 @@ local function markWalletAsSearched(item)
     if not modData then return end
 
     modData[WALLET_SEARCHED_KEY] = true
-    item:setName("Empty " .. getWalletBaseName(item))
+    item:setName(T("CECommon_UI_Wallet_EmptyName", "Empty {name}", {
+        name = getWalletBaseName(item)
+    }))
 end
 
 local function findWalletInPlayerInventory(player, itemID)
@@ -234,7 +266,7 @@ local function OnServerCommand(module, command, args)
         end
 
         if type == "ALREADY_SEARCHED" then
-            ShowFloatingText(player, "Already searched", 150, 150, 150)
+            ShowFloatingText(player, T("CECommon_UI_Wallet_AlreadySearched", "Already searched"), 150, 150, 150)
             return
         end
 
@@ -246,7 +278,7 @@ local function OnServerCommand(module, command, args)
                 ForceSay(player, GetRandomLine(WalletTalk.Empty))
             end
             
-            ShowFloatingText(player, "Empty", 150, 150, 150)
+            ShowFloatingText(player, T("CECommon_UI_Wallet_Empty", "Empty"), 150, 150, 150)
         else
             if DT_AudioManager then DT_AudioManager.PlaySound("CE_Cashier", false, 1.0) else getSoundManager():PlaySound("CE_Cashier", false, 1.0) end
             
@@ -264,7 +296,9 @@ local function OnServerCommand(module, command, args)
                 if ZombRand(100) < 30 then ForceSay(player, GetRandomLine(WalletTalk.Low)) end
             end
             
-            local messageText = "+ $" .. tostring(total)
+            local messageText = T("CECommon_UI_MoneyGain", "+ {amount}", {
+                amount = formatMoney(total)
+            })
             ShowFloatingText(player, messageText, r, g, b)
         end
     end
@@ -384,17 +418,21 @@ local function WalletContextMenu(player, context, items)
         
         -- Option 1: Open Selected
         if searchableWalletCount > 0 then
-            local text = "Rummage through Wallet"
+            local text = T("CECommon_UI_Wallet_Search", "Rummage through Wallet")
             if searchableWalletCount > 1 then
-                text = "Rummage through Selected Wallets (" .. searchableWalletCount .. ")"
+                text = T("CECommon_UI_Wallet_SearchSelected", "Rummage through Selected Wallets ({count})", {
+                    count = tostring(searchableWalletCount)
+                })
             end
             
             local option = context:addOption(text, items, OnOpenWallet, playerObj, false)
             if diceIcon then option.iconTexture = diceIcon end
         else
-            local text = "Wallet Already Empty"
+            local text = T("CECommon_UI_Wallet_AlreadyEmpty", "Wallet Already Empty")
             if walletCount > 1 then
-                text = "Selected Wallets Already Empty (" .. walletCount .. ")"
+                text = T("CECommon_UI_Wallet_SelectedAlreadyEmpty", "Selected Wallets Already Empty ({count})", {
+                    count = tostring(walletCount)
+                })
             end
             addDisabledWalletOption(context, text, diceIcon)
         end
@@ -413,9 +451,11 @@ local function WalletContextMenu(player, context, items)
 
             -- Show the container-wide action when it would process wallets beyond the current selection
             if totalSearchableWalletsInContainer > searchableWalletCount then
-                local allText = "Rummage through ALL Wallets (" .. totalSearchableWalletsInContainer .. ")"
+                local allText = T("CECommon_UI_Wallet_SearchAll", "Rummage through ALL Wallets ({count})", {
+                    count = tostring(totalSearchableWalletsInContainer)
+                })
                 if totalSearchableWalletsInContainer == 1 then
-                    allText = "Rummage through Remaining Wallet"
+                    allText = T("CECommon_UI_Wallet_SearchRemaining", "Rummage through Remaining Wallet")
                 end
                 local allOption = context:addOption(allText, items, OnOpenWallet, playerObj, true)
                 if diceIcon then allOption.iconTexture = diceIcon end

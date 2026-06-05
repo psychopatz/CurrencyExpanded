@@ -6,6 +6,7 @@ pcall(require, "DT/V2/NPC/UI/DTNPC_TraderDialogue_Hub")
 
 local ScratchTickets = CurrencyExpanded.ScratchTickets or {}
 local PendingClaim = nil
+local CEText = CurrencyExpanded and CurrencyExpanded.Text or nil
 
 if DT_AudioManager and DT_AudioManager.RegisterCategory then
     DT_AudioManager.RegisterCategory("CE_Cashier", "Wallet")
@@ -13,6 +14,27 @@ end
 
 local function getLocalPlayer()
     return getPlayer() or getSpecificPlayer(0)
+end
+
+local function T(key, fallback, params)
+    if CEText and CEText.Get then
+        return CEText.Get(key, params, fallback)
+    end
+
+    if type(params) == "table" and fallback then
+        return (tostring(fallback):gsub("{([%w_]+)}", function(name)
+            local value = params[name]
+            return value == nil and ("{" .. name .. "}") or tostring(value)
+        end))
+    end
+
+    return fallback or key
+end
+
+local function formatMoney(amount)
+    return T("CECommon_UI_MoneyAmount", "${amount}", {
+        amount = tostring(math.max(0, math.floor(tonumber(amount) or 0)))
+    })
 end
 
 local function playUISound(soundName)
@@ -135,16 +157,22 @@ end
 local function buildClaimLine(args)
     local total = math.max(0, tonumber(args and args.total) or 0)
     local count = math.max(0, tonumber(args and args.count) or 0)
+    local totalText = formatMoney(total)
 
     if total <= 0 or count <= 0 then
-        return "No winners to cash today. Bring me a real hit."
+        return T("CECommon_Dialogue_Claim_ResultNone", "No winners to cash today. Bring me a real hit.")
     end
 
     if count == 1 then
-        return "House pays. That's $" .. tostring(total) .. " for your winner."
+        return T("CECommon_Dialogue_Claim_ResultSingle", "House pays. That's {total} for your winner.", {
+            total = totalText
+        })
     end
 
-    return "Nice stack. That's $" .. tostring(total) .. " across " .. tostring(count) .. " winning tickets."
+    return T("CECommon_Dialogue_Claim_ResultMulti", "Nice stack. That's {total} across {count} winning tickets.", {
+        total = totalText,
+        count = tostring(count)
+    })
 end
 
 local function getClaimSummary(player)
@@ -158,10 +186,6 @@ local function getClaimSummary(player)
     return math.max(0, count or 0), math.max(0, total or 0)
 end
 
-local function isClaimOptionText(text)
-    return tostring(text or ""):find("^Claim Win Payout", 1) ~= nil
-end
-
 local function requestClaim(ui, trader, player, refreshFn)
     if not ui or not trader or not player then
         return
@@ -169,7 +193,7 @@ local function requestClaim(ui, trader, player, refreshFn)
 
     local ticketCount, total = getClaimSummary(player)
     if ticketCount <= 0 then
-        ui:speak("You don't have a winning ticket for me right now.")
+        ui:speak(T("CECommon_Dialogue_Claim_NoWinners", "You don't have a winning ticket for me right now."))
         if refreshFn then
             refreshFn()
         end
@@ -209,14 +233,19 @@ local function injectClaimOption(options, ui, trader, player, refreshFn)
     end
 
     for _, option in ipairs(options) do
-        if isClaimOptionText(option.text) then
+        if option and option.ceScratchClaimOption == true then
             return options
         end
     end
 
     table.insert(options, findInsertIndex(options), {
-        text = "Claim Win Payout ($" .. tostring(total) .. ")",
-        message = "I need to cash in $" .. tostring(total) .. " worth of winning tickets.",
+        ceScratchClaimOption = true,
+        text = T("CECommon_Dialogue_Claim_OptionText", "Claim Win Payout ({total})", {
+            total = formatMoney(total)
+        }),
+        message = T("CECommon_Dialogue_Claim_OptionMessage", "I need to cash in {total} worth of winning tickets.", {
+            total = formatMoney(total)
+        }),
         onSelect = function()
             requestClaim(ui, trader, player, refreshFn)
         end
@@ -236,7 +265,7 @@ end
 local function stripClaimOption(options)
     local cleaned = {}
     for _, option in ipairs(options or {}) do
-        if not isClaimOptionText(option.text) then
+        if not (option and option.ceScratchClaimOption == true) then
             table.insert(cleaned, option)
         end
     end
@@ -330,9 +359,11 @@ local function OnServerCommand(module, command, args)
     if player then
         if (tonumber(args and args.total) or 0) > 0 then
             playUISound("CE_Cashier")
-            player:setHaloNote("+ $" .. tostring(args.total), 50, 255, 50, 300)
+            player:setHaloNote(T("CECommon_UI_MoneyGain", "+ {amount}", {
+                amount = formatMoney(args.total)
+            }), 50, 255, 50, 300)
         else
-            player:setHaloNote("No payout", 170, 170, 170, 300)
+            player:setHaloNote(T("CECommon_UI_NoPayout", "No payout"), 170, 170, 170, 300)
         end
     end
 

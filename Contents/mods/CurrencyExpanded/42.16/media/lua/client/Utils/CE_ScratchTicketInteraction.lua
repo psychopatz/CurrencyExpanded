@@ -7,6 +7,7 @@ require "CE/Common/InteractionStrings/Lottery/CE_InteractionStrings_Lottery_Scra
 
 local ScratchTickets = CurrencyExpanded.ScratchTickets or {}
 local ScratchTalk = CurrencyExpanded.GetInteractionStrings("Lottery", "ScratchTicket") or {}
+local CEText = CurrencyExpanded and CurrencyExpanded.Text or nil
 
 if DT_AudioManager and DT_AudioManager.RegisterCategory then
     DT_AudioManager.RegisterCategory("CE_Casino", "Wallet")
@@ -19,10 +20,34 @@ end
 
 local function getRandomLine(category)
     if not category or #category == 0 then
+        if CEText and CEText.Get then
+            return CEText.Get("CECommon_UI_Fallback_Ellipsis", nil, "...")
+        end
         return "..."
     end
 
     return category[ZombRand(#category) + 1]
+end
+
+local function T(key, fallback, params)
+    if CEText and CEText.Get then
+        return CEText.Get(key, params, fallback)
+    end
+
+    if type(params) == "table" and fallback then
+        return (tostring(fallback):gsub("{([%w_]+)}", function(name)
+            local value = params[name]
+            return value == nil and ("{" .. name .. "}") or tostring(value)
+        end))
+    end
+
+    return fallback or key
+end
+
+local function formatMoney(amount)
+    return T("CECommon_UI_MoneyAmount", "${amount}", {
+        amount = tostring(math.max(0, math.floor(tonumber(amount) or 0)))
+    })
 end
 
 local function forceSay(player, text)
@@ -83,7 +108,7 @@ local function showScratchFeedback(player, args)
     local amount = math.max(0, tonumber(args and args.amount) or 0)
 
     if status == "ALREADY_SCRATCHED" then
-        player:setHaloNote("Already scratched", 150, 150, 150, 300)
+        player:setHaloNote(T("CECommon_UI_Scratch_AlreadyScratched", "Already scratched"), 150, 150, 150, 300)
         if ZombRand(100) < 45 then
             forceSay(player, getRandomLine(ScratchTalk.AlreadyScratched))
         end
@@ -92,7 +117,7 @@ local function showScratchFeedback(player, args)
 
     if resultType == "LOSE" then
         playUISound("CE_CasinoLose")
-        player:setHaloNote("Loser", 170, 170, 170, 300)
+        player:setHaloNote(T("CECommon_UI_Scratch_LoseHalo", "Loser"), 170, 170, 170, 300)
         if ZombRand(100) < 60 then
             forceSay(player, getRandomLine(ScratchTalk.Lose))
         end
@@ -120,7 +145,9 @@ local function showScratchFeedback(player, args)
         end
     end
 
-    player:setHaloNote("+ $" .. tostring(amount), r, g, b, 300)
+    player:setHaloNote(T("CECommon_UI_MoneyGain", "+ {amount}", {
+        amount = formatMoney(amount)
+    }), r, g, b, 300)
 end
 
 local function findTicketInPlayerInventory(player, itemID)
@@ -421,9 +448,11 @@ local function ScratchTicketContextMenu(playerIndex, context, items)
     local scratchIcon = getTexture("Item_ScratchTicket") or getTexture("Item_Dice")
 
     if scratchableCount > 0 then
-        local text = "Carefully Scratch Ticket"
+        local text = T("CECommon_UI_Scratch_Single", "Carefully Scratch Ticket")
         if scratchableCount > 1 then
-            text = "Carefully Scratch Selected Tickets (" .. scratchableCount .. ")"
+            text = T("CECommon_UI_Scratch_Selected", "Carefully Scratch Selected Tickets ({count})", {
+                count = tostring(scratchableCount)
+            })
         end
 
         local option = context:addOption(text, items, onScratchTickets, playerObj, false)
@@ -431,9 +460,9 @@ local function ScratchTicketContextMenu(playerIndex, context, items)
             option.iconTexture = scratchIcon
         end
     else
-        local text = "Selected Tickets Already Scratched"
+        local text = T("CECommon_UI_Scratch_SelectedAlready", "Selected Tickets Already Scratched")
         if ticketCount == 1 then
-            text = "Ticket Already Scratched"
+            text = T("CECommon_UI_Scratch_TicketAlready", "Ticket Already Scratched")
         end
         addDisabledOption(context, text, scratchIcon)
     end
@@ -453,9 +482,11 @@ local function ScratchTicketContextMenu(playerIndex, context, items)
     end
 
     if totalScratchableInContainer > scratchableCount then
-        local allText = "Carefully Scratch ALL Tickets (" .. totalScratchableInContainer .. ")"
+        local allText = T("CECommon_UI_Scratch_All", "Carefully Scratch ALL Tickets ({count})", {
+            count = tostring(totalScratchableInContainer)
+        })
         if totalScratchableInContainer == 1 then
-            allText = "Carefully Scratch Remaining Ticket"
+            allText = T("CECommon_UI_Scratch_Remaining", "Carefully Scratch Remaining Ticket")
         end
 
         local allOption = context:addOption(allText, items, onScratchTickets, playerObj, true)

@@ -1,0 +1,8 @@
+Currency Expanded translation rules
+
+- Put reusable player-facing text in `common/media/lua/shared/Translate/<LANG>/`.
+- Use semantic keys under `CECommon_UI`, `CECommon_Dialogue`, and `CECommon_Ambient`.
+- Do not add visible inline English to runtime Lua unless it is a temporary migration fallback.
+- Use `{named_placeholders}` instead of string concatenation for translated output.
+- Random speech pools should use numbered keys like `CECommon_Ambient_Wallet_High_1`.
+- Future versions should reuse `CurrencyExpanded.Text` instead of creating version-specific text helpers.

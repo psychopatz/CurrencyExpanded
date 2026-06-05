@@ -5,9 +5,43 @@ pcall(require, "DT/V2/NPC/UI/DTNPC_TraderDialogue_Hub")
 
 local ScratchTickets = CurrencyExpanded.ScratchTickets or {}
 local PendingLotteryInfo = nil
+local CEText = CurrencyExpanded and CurrencyExpanded.Text or nil
 
 local function getLocalPlayer()
     return getPlayer() or getSpecificPlayer(0)
+end
+
+local function T(key, fallback, params)
+    if CEText and CEText.Get then
+        return CEText.Get(key, params, fallback)
+    end
+
+    if type(params) == "table" and fallback then
+        return (tostring(fallback):gsub("{([%w_]+)}", function(name)
+            local value = params[name]
+            return value == nil and ("{" .. name .. "}") or tostring(value)
+        end))
+    end
+
+    return fallback or key
+end
+
+local function getList(prefix)
+    if CEText and CEText.GetList then
+        return CEText.GetList(prefix, {})
+    end
+
+    return {}
+end
+
+local function pick(prefix, params, fallback)
+    local values = getList(prefix)
+    local chosen = values[ZombRand(math.max(#values, 1)) + 1]
+    if chosen then
+        return CEText and CEText.Format and CEText.Format(chosen, params) or T(prefix .. "_1", chosen, params)
+    end
+
+    return T(prefix .. "_1", fallback or prefix, params)
 end
 
 local function getTraderData(trader)
@@ -43,47 +77,56 @@ local function copyOptions(options)
 end
 
 local function formatMoney(amount)
-    return "$" .. tostring(math.max(0, math.floor(tonumber(amount) or 0)))
+    return T("CECommon_UI_MoneyAmount", "${amount}", {
+        amount = tostring(math.max(0, math.floor(tonumber(amount) or 0)))
+    })
 end
 
 local function buildJackpotReply(payload)
-    local jackpot = formatMoney(payload and payload.jackpot or 0)
-    local commonHighMax = formatMoney(payload and payload.commonHighMax or 0)
-    local variants = {
-        "Current live jackpot is " .. jackpot .. ". Common wins top out around " .. commonHighMax .. ", so anything above that is the real board.",
-        "Board's sitting at " .. jackpot .. " right now. Regular winners stay under about " .. commonHighMax .. "; the rest is jackpot country.",
-        "Live pot's up to " .. jackpot .. ". Standard tickets can still hit, but the true jackpot starts above roughly " .. commonHighMax .. "."
-    }
-
-    return variants[ZombRand(#variants) + 1]
+    return pick("CECommon_Dialogue_Gambler_JackpotReply", {
+        jackpot = formatMoney(payload and payload.jackpot or 0),
+        commonHighMax = formatMoney(payload and payload.commonHighMax or 0),
+    }, "Current live jackpot is {jackpot}. Common wins top out around {commonHighMax}, so anything above that is the real board.")
 end
 
 local function buildWinnersReply(payload)
     local winners = payload and payload.winners or nil
     if type(winners) ~= "table" or #winners == 0 then
-        return "Quiet week so far. Board's still warming up and nobody's posted a real brag yet."
+        return T("CECommon_Dialogue_Gambler_WinnersNone", "Quiet week so far. Board's still warming up and nobody's posted a real brag yet.")
     end
 
     local fragments = {}
     for index = 1, math.min(#winners, 5) do
         local entry = winners[index]
-        local name = tostring(entry and entry.name or "Unknown")
+        local name = tostring(entry and entry.name or T("CECommon_Dialogue_Gambler_WinnersUnknown", "Unknown"))
         local amount = formatMoney(entry and entry.amount or 0)
         local hits = math.max(1, math.floor(tonumber(entry and entry.hits) or 1))
         local bestAmount = formatMoney(entry and entry.bestAmount or entry and entry.amount or 0)
 
         if hits > 1 then
-            fragments[#fragments + 1] = name .. " " .. amount .. " total over " .. tostring(hits) .. " wins"
+            fragments[#fragments + 1] = T("CECommon_Dialogue_Gambler_WinnersFragmentMulti", "{name} {amount} total over {hits} wins", {
+                name = name,
+                amount = amount,
+                hits = tostring(hits),
+            })
         else
-            fragments[#fragments + 1] = name .. " " .. amount .. " total"
+            fragments[#fragments + 1] = T("CECommon_Dialogue_Gambler_WinnersFragmentSingle", "{name} {amount} total", {
+                name = name,
+                amount = amount,
+            })
         end
 
         if index == 1 and hits > 1 then
-            fragments[#fragments] = fragments[#fragments] .. " (best hit " .. bestAmount .. ")"
+            fragments[#fragments] = T("CECommon_Dialogue_Gambler_WinnersBestHit", "{fragment} (best hit {amount})", {
+                fragment = fragments[#fragments],
+                amount = bestAmount,
+            })
         end
     end
 
-    return "This week's board reads: " .. table.concat(fragments, ", ") .. "."
+    return T("CECommon_Dialogue_Gambler_WinnersSummary", "This week's board reads: {entries}.", {
+        entries = table.concat(fragments, ", "),
+    })
 end
 
 local function buildPayoutReply(payload)
@@ -92,7 +135,12 @@ local function buildPayoutReply(payload)
     local highMax = formatMoney(payload and payload.commonHighMax or 0)
     local jackpot = formatMoney(payload and payload.jackpot or 0)
 
-    return "Low hits run up to " .. lowMax .. ", medium hits climb to about " .. mediumMax .. ", and the high common board stops near " .. highMax .. ". After that, you're chasing the live jackpot at " .. jackpot .. "."
+    return T("CECommon_Dialogue_Gambler_PayoutReply", "Low hits run up to {lowMax}, medium hits climb to about {mediumMax}, and the high common board stops near {highMax}. After that, you're chasing the live jackpot at {jackpot}.", {
+        lowMax = lowMax,
+        mediumMax = mediumMax,
+        highMax = highMax,
+        jackpot = jackpot,
+    })
 end
 
 local function buildInfoReply(payload)
@@ -121,20 +169,15 @@ local function buildWinnerGreeting(player)
     end
 
     if count == 1 then
-        local variants = {
-            "Hold on, you've got a live winner on you. That's $" .. tostring(total) .. ". Didn't expect you to walk in already beating the board.",
-            "Well now, that's a winning ticket in your pocket. $" .. tostring(total) .. " on the table already.",
-            "You came in carrying a hitter. That's $" .. tostring(total) .. " waiting to be paid."
-        }
-        return variants[ZombRand(#variants) + 1]
+        return pick("CECommon_Dialogue_Gambler_WinnerGreetingSingle", {
+            total = formatMoney(total),
+        }, "Hold on, you've got a live winner on you. That's {total}. Didn't expect you to walk in already beating the board.")
     end
 
-    local variants = {
-        "Damn, you've got " .. tostring(count) .. " winners on you already. That's $" .. tostring(total) .. " waiting at my counter.",
-        "Now that's a surprise. " .. tostring(count) .. " winning tickets for a total of $" .. tostring(total) .. ".",
-        "You're walking in hot. I count " .. tostring(count) .. " winning scratches, worth $" .. tostring(total) .. " altogether."
-    }
-    return variants[ZombRand(#variants) + 1]
+    return pick("CECommon_Dialogue_Gambler_WinnerGreetingMulti", {
+        count = tostring(count),
+        total = formatMoney(total),
+    }, "Damn, you've got {count} winners on you already. That's {total} waiting at my counter.")
 end
 
 local function showLotteryChatMenu(ui, trader, npc, player, rootGenerator)
@@ -144,22 +187,16 @@ local function showLotteryChatMenu(ui, trader, npc, player, rootGenerator)
 
     local options = {
         {
-            text = "House Banter",
-            message = "How's the table feeling today?",
+            text = T("CECommon_Dialogue_Gambler_ChatHouseBanter", "House Banter"),
+            message = T("CECommon_Dialogue_Gambler_ChatHouseBanterMessage", "How's the table feeling today?"),
             onSelect = function(innerUI)
-                local variants = {
-                    "Luck's moody, but business is awake. That's usually enough.",
-                    "Table's been mean, which means it's due to flinch eventually.",
-                    "I've seen worse boards. I've also seen better liars.",
-                    "People keep chasing the top line. House keeps eating the nerves."
-                }
-                innerUI:speak(variants[ZombRand(#variants) + 1])
+                innerUI:speak(pick("CECommon_Dialogue_Gambler_HouseBanterReply", nil, "Luck's moody, but business is awake. That's usually enough."))
                 showLotteryChatMenu(innerUI, trader, npc, player, rootGenerator)
             end
         },
         {
-            text = "Current Jackpot",
-            message = "What's the current jackpot sitting at?",
+            text = T("CECommon_Dialogue_Gambler_ChatJackpot", "Current Jackpot"),
+            message = T("CECommon_Dialogue_Gambler_ChatJackpotMessage", "What's the current jackpot sitting at?"),
             onSelect = function(innerUI)
                 PendingLotteryInfo = {
                     ui = innerUI,
@@ -181,8 +218,8 @@ local function showLotteryChatMenu(ui, trader, npc, player, rootGenerator)
             end
         },
         {
-            text = "Winners This Week",
-            message = "Who has been winning this week?",
+            text = T("CECommon_Dialogue_Gambler_ChatWinners", "Winners This Week"),
+            message = T("CECommon_Dialogue_Gambler_ChatWinnersMessage", "Who has been winning this week?"),
             onSelect = function(innerUI)
                 PendingLotteryInfo = {
                     ui = innerUI,
@@ -204,8 +241,8 @@ local function showLotteryChatMenu(ui, trader, npc, player, rootGenerator)
             end
         },
         {
-            text = "How The Board Pays",
-            message = "Break down the payouts for me.",
+            text = T("CECommon_Dialogue_Gambler_ChatPayouts", "How The Board Pays"),
+            message = T("CECommon_Dialogue_Gambler_ChatPayoutsMessage", "Break down the payouts for me."),
             onSelect = function(innerUI)
                 PendingLotteryInfo = {
                     ui = innerUI,
@@ -227,8 +264,8 @@ local function showLotteryChatMenu(ui, trader, npc, player, rootGenerator)
             end
         },
         {
-            text = "< Back",
-            message = "Let's get back to business.",
+            text = T("CECommon_Dialogue_Gambler_Back", "< Back"),
+            message = T("CECommon_Dialogue_Gambler_BackMessage", "Let's get back to business."),
             onSelect = function(innerUI)
                 if rootGenerator then
                     rootGenerator(innerUI, npc, player)
@@ -248,14 +285,9 @@ local function decorateRootOptions(options, ui, npc, player, rootGenerator)
     local updated = copyOptions(options)
     for _, option in ipairs(updated) do
         if option.text == "Chat" then
-            option.message = "Let's talk lottery for a second."
+            option.message = T("CECommon_Dialogue_Gambler_RootChatMessage", "Let's talk lottery for a second.")
             option.onSelect = function(innerUI)
-                local lines = {
-                    "You want table talk or board talk?",
-                    "Fine. Ask your lottery questions.",
-                    "All right. What part of the board are you chasing?"
-                }
-                innerUI:speak(lines[ZombRand(#lines) + 1])
+                innerUI:speak(pick("CECommon_Dialogue_Gambler_RootChatIntro", nil, "You want table talk or board talk?"))
                 showLotteryChatMenu(innerUI, ui.target, npc, player, rootGenerator)
             end
             break
