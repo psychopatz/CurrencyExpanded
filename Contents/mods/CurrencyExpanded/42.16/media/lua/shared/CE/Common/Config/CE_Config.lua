@@ -39,8 +39,55 @@ local function normalizeSystemID(systemID)
     return "CurrencyExpanded:" .. tostring(systemID or "")
 end
 
+local function inferLevel(category, subcategory)
+    local categoryLower = string.lower(tostring(category or ""))
+    local subcategoryLower = string.lower(tostring(subcategory or ""))
+    if string.find(categoryLower, "error", 1, true) or string.find(subcategoryLower, "error", 1, true) then
+        return "error"
+    end
+    if string.find(categoryLower, "warn", 1, true) or string.find(subcategoryLower, "warn", 1, true) then
+        return "warn"
+    end
+    if string.find(categoryLower, "debug", 1, true) or string.find(subcategoryLower, "debug", 1, true) then
+        return "debug"
+    end
+    if string.find(categoryLower, "trace", 1, true) or string.find(subcategoryLower, "trace", 1, true) then
+        return "trace"
+    end
+    return "info"
+end
+
+function CurrencyExpanded.LogLevel(level, module, category, subcategory, message)
+    if DynamicTrading and DynamicTrading.LogLevel then
+        DynamicTrading.LogLevel(
+            tostring(level or "info"),
+            tostring(module or "CECommons"),
+            tostring(category or "Log"),
+            tostring(subcategory or "Core"),
+            tostring(message or "")
+        )
+        return
+    end
+end
+
 function CurrencyExpanded.Log(module, category, subcategory, message)
-    print(string.format("[%s][%s][%s] %s", module, category, subcategory, message))
+    CurrencyExpanded.LogLevel(inferLevel(category, subcategory), module, category, subcategory, message)
+end
+
+function CurrencyExpanded.LogWarn(module, category, subcategory, message)
+    CurrencyExpanded.LogLevel("warn", module, category, subcategory, message)
+end
+
+function CurrencyExpanded.LogError(module, category, subcategory, message)
+    CurrencyExpanded.LogLevel("error", module, category, subcategory, message)
+end
+
+function CurrencyExpanded.LogDebug(module, category, subcategory, message)
+    CurrencyExpanded.LogLevel("debug", module, category, subcategory, message)
+end
+
+function CurrencyExpanded.LogTrace(module, category, subcategory, message)
+    CurrencyExpanded.LogLevel("trace", module, category, subcategory, message)
 end
 
 function CurrencyExpanded.RegisterInteractionStrings(systemID, partID, data)

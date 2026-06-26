@@ -133,7 +133,11 @@ function Text.LogMissing(key)
     end
 
     Text._missingLogged[normalized] = true
-    print("[CurrencyExpanded.Text] Missing translation key: " .. normalized)
+    if CurrencyExpanded and CurrencyExpanded.LogWarn then
+        CurrencyExpanded.LogWarn("CECommons", "Warn", "Text", "Missing translation key: " .. normalized)
+    elseif CurrencyExpanded and CurrencyExpanded.Log then
+        CurrencyExpanded.Log("CECommons", "Warn", "Text", "Missing translation key: " .. normalized)
+    end
     return true
 end
 
